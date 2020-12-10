@@ -12,14 +12,14 @@ def part1(n):
 
 def part2(n):
     n = [0] + sorted(n)
-    p = {}
-    for i in n:
-        p[i] = 1
+    n.append(n[-1]+3) # Append final element as sentinel.
+    p = [0] * (len(n)-3) + [1, 1, 1]
+    # p[i] = number of paths starting at n[i].
+    # By definition, only 1 path to the last element from each of the last 3.
     for i in range(len(n)-4, -1, -1):
-        p[n[i]] = 0
         for j in range(i+3, i, -1):
             if n[j] - n[i] <= 3:
-                p[n[i]] += p[n[j]]
+                p[i] += p[j]
     return p[0]
 
 fn = "input10.txt"
