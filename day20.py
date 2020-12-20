@@ -125,8 +125,6 @@ class Board(object):
         if r > 0:
             possible = self.has_top(self.m[r-1][c].bottom())
             candidates = intersect(candidates, possible)
-        if c == 0 and r == 0:
-            candidates = {'1951': True}
         for tid in candidates:
             tile = copy.copy(self.tiles[tid])
             assert(tile.orientation == 0)
