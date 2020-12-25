@@ -1,6 +1,6 @@
 #!/opt/local/bin/python
 
-class Card:
+class Peer:
     def __init__(self, pub):
         self.pub = pub
         val, ls = 1, 0
@@ -15,9 +15,9 @@ class Card:
         return val
 
 pubs = [6270530, 14540258]
-keys = [Card(p) for p in pubs]
+peer = [Peer(p) for p in pubs]
 ans = []
-for i in range(len(keys)):
-    ans.append(keys[i].ek(keys[1-i].pub))
+for i in range(len(peer)):
+    ans.append(peer[i].ek(peer[1-i].pub))
 assert(ans[0] == ans[1])
 print(ans[0])
