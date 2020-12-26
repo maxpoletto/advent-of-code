@@ -2,7 +2,8 @@
 
 import re
 
-filename = "input04.txt"
+def is_valid1(info):
+    return len(info) == 8 or (len(info) == 7 and "cid" not in info)
 
 def valid_num(s, l, min, max):
     if (len(s)) != l:
@@ -21,39 +22,45 @@ def valid_height(s):
 
 valid_color = { "amb":True, "blu":True, "brn":True, "gry":True, "grn":True, "hzl":True, "oth":True }
 
-def is_valid(info):
+def is_valid2(info):
     if len(info) != 8 and not (len(info) == 7 and "cid" not in info):
-        return 0
+        return False
     if not valid_num(info["byr"], 4, 1920, 2002):
-        return 0
+        return False
     if not valid_num(info["iyr"], 4, 2010, 2020):
-        return 0
+        return False
     if not valid_num(info["eyr"], 4, 2020, 2030):
-        return 0
+        return False
     if not valid_height(info["hgt"]):
-        return 0
+        return False
     if not re.fullmatch(r'#[0-9a-f]{6}', info["hcl"]):
-        return 0
+        return False
     if not info["ecl"] in valid_color:
-        return 0
+        return False
     if not valid_num(info["pid"], 9, 0, 999999999):
-        return 0
-    return 1
+        return False
+    return True
 
-nvalid, ntotal = 0, 0
+def part1(passports):
+    return sum([is_valid1(p) for p in passports])
+
+def part2(passports):
+    return sum([is_valid2(p) for p in passports])
+
 regex = re.compile(r'(byr|iyr|eyr|hgt|hcl|ecl|pid|cid):([^\s]+)')
-info = {}
-with open(filename) as f:
+passports, info = [], {}
+fn = "input04.txt"
+with open(fn) as f:
     for l in f:
         l = l.strip()
         if len(l) == 0:
-            nvalid += is_valid(info)
-            ntotal += 1
+            passports.append(info)
             info = {}
         else:
             for i in regex.findall(l):
                 info[i[0]] = i[1]
 if len(info) > 0:
-    nvalid += is_valid(info)
-    ntotal += 1
-print(nvalid, "valid passports out of", ntotal)
+    passports.append(info)
+
+print(part1(passports))
+print(part2(passports))

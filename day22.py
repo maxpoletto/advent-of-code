@@ -30,28 +30,20 @@ class Player:
     def __str__(self):
         return str(self.id) + ":" + str(self.cards)
 
-def recursive_combat(player1, player2):
-    while player1.num_cards() > 0 and player2.num_cards() > 0:
-        if player1.cards_already_seen() or player2.cards_already_seen():
-            return player1
-        player1.set_history()
-        player2.set_history()
-        c1 = player1.pick_card()
-        c2 = player2.pick_card()
-        if player1.num_cards() >= c1 and player2.num_cards() >= c2:
-            winner = recursive_combat(player1.copy(c1), player2.copy(c2))
-            if winner.id == 1:
-                player1.add_cards([c1,c2])
-            else:
-                player2.add_cards([c2,c1])
-        else:
-            if c1 > c2:
-                player1.add_cards([c1,c2])
-            else:
-                player2.add_cards([c2,c1])
-    if player1.num_cards() > 0:
-        return player1
-    return player2
+def recursive_combat(p):
+    while p[0].num_cards() > 0 and p[1].num_cards() > 0:
+        if p[0].cards_already_seen() or p[1].cards_already_seen():
+            return p[0]
+        p[0].set_history()
+        p[1].set_history()
+        c = [p[0].pick_card(), p[1].pick_card()]
+        winner_id = int(c[1] > c[0])
+        if p[0].num_cards() >= c[0] and p[1].num_cards() >= c[1]:
+            w = recursive_combat([p[0].copy(c[0]), p[1].copy(c[1])])
+            winner_id = w.id
+        p[winner_id].add_cards([c[winner_id], c[1-winner_id]])
+    winner_id = int(p[1].num_cards() > 0)
+    return p[winner_id]
 
 def part1(cards):
     player1 = Player(1, cards[0])
@@ -68,9 +60,7 @@ def part1(cards):
     return player2.score()
 
 def part2(cards):
-    player1 = Player(1, cards[0])
-    player2 = Player(2, cards[1])
-    winner = recursive_combat(player1, player2)
+    winner = recursive_combat([Player(0, cards[0]), Player(1, cards[1])])
     return winner.score()
 
 fn = "input22.txt"

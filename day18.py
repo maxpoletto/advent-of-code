@@ -49,7 +49,7 @@ def evaluate1(e):
             s = eval_op(s)
     return s[0]
 
-def test_evaluate():
+def test_evaluate1():
     assert evaluate1("2 + 2") == 4
     assert evaluate1("2 * 3 + (4 * 5) ") == 26
     assert evaluate1("5 + (8 * 3 + 9 + 3 * 4 * 3) ") == 437
