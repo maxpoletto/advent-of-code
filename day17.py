@@ -1,183 +1,82 @@
 #!/opt/local/bin/python
 
-import copy
-
 class World(object):
-    """
-    docstring
-    """
-    def __init__(self, lines, maxturns):
-        """
-        docstring
-        """
-        d = max(len(lines), len(lines[0]))
-        self.size = d + 2*maxturns
+    def __init__(self, lines, ndims, maxturns):
+        assert len(lines) == len(lines[0])
+        self.dim = len(lines)+2*maxturns
         self.zero = maxturns
-        self.dirs = [[x, y, z] for x in [-1,0,1]
-            for y in [-1,0,1] for z in [-1,0,1] if x != 0 or y != 0 or z != 0]
-        self.m = self.__blank()
+        self.ndims = ndims
+        self.noff = [0] * 3**ndims
+        l = 1
+        for i in range(ndims):
+            m = self.dim**i
+            for j in range(l):
+                self.noff[l+j] = self.noff[j] + m
+                self.noff[2*l+j] = self.noff[j] - m
+            l *= 3
+        self.noff = self.noff[1:]
+        self.buf = [0] * (self.dim**self.ndims)
         for y in range(len(lines)):
-            for x in range(len(lines[0])):
-                self.m[self.zero][y+self.zero][x+self.zero] = lines[y][x]
-
-    def __blank(self):
-        m = [None]*self.size
-        for z in range(self.size):
-            m[z] = [None]*self.size
-            for y in range(self.size):
-                m[z][y] = ['.']*self.size
-        return m
-
-    def nn(self, x, y, z, v):
+            for x in range(len(lines)):
+                if lines[y][x] == '#':
+                    self.set_pt([x, y])
+    def set_pt(self, p):
+        assert(self.ndims >= len(p))
+        i, m, pos = 0, 1, 0
+        while i < len(p):
+            pos += (self.zero+p[i])*m
+            m *= self.dim
+            i += 1
+        while i < self.ndims:
+            pos += self.zero*m
+            m *= self.dim
+            i += 1
+        assert(pos < len(self.buf))
+        self.buf[pos] = 1
+    def nn(self, i):
         n = 0
-        for d in self.dirs:
-            xx, yy, zz = x+d[0], y+d[1], z+d[2]
-            if self.m[zz][yy][xx] == v:
+        for j in self.noff:
+            if i+j >= 0 and i+j < len(self.buf) and self.buf[j+i] == 1:
                 n += 1
         return n
-    
-    def step(self):
-        m2 = self.__blank()
-        for z in range(1, self.size-1):
-            for y in range(1, self.size-1):
-                for x in range(1, self.size-1):
-                    if self.m[z][y][x] == '#':
-                        n = self.nn(x,y,z,'#')
-                        if n == 2 or n == 3:
-                            m2[z][y][x] = '#'
-                    elif self.m[z][y][x] == '.':
-                        n = self.nn(x,y,z,'#')
-                        if n == 3:
-                            m2[z][y][x] = '#'
-        self.m = m2
-
-    def print(self):
-        for z in range(self.size):
-            print("z=", z-self.zero)
-            for y in range(self.size):
-                for x in range(self.size):
-                    print(self.m[z][y][x], end='')
-                print()
-        print(self.size, self.zero, self.dirs, len(self.dirs))
-
+    def step(self, steps):
+        for _ in range(steps):
+            buf = [0] * (self.dim**self.ndims)
+            for i in range(len(self.buf)):
+                n = self.nn(i)
+                buf[i] = int((self.buf[i] == 1 and (n == 2 or n == 3)) or
+                    (self.buf[i] == 0 and n == 3))
+            self.buf = buf
     def nactive(self):
-        n = 0
-        for z in range(1, self.size-1):
-            for y in range(1, self.size-1):
-                for x in range(1, self.size-1):
-                    if self.m[z][y][x] == '#':
-                        n+=1
-        return n
+        return self.buf.count(1)
 
-'''
-    def __p2i(p):
-        [x, y, z] = p
-        return x + self.size * (y + z * self.size)
-    def __i2p(i):
-        z = int(i / (self.size*self.size))
-        r = i % (self.size*self.size)
-        y = 
-        z = 
-'''
+def test():
+    m = [
+        '.#.',
+        '..#',
+        '###',
+    ]
+    w = World(m, 3, 6)
+    w.step(6)
+    assert(w.nactive() == 112)
+    w = World(m, 4, 6)
+    w.step(6)
+    assert(w.nactive() == 848)
 
-class World4(object):
-    """
-    docstring
-    """
-    def __init__(self, lines, maxturns):
-        """
-        docstring
-        """
-        d = max(len(lines), len(lines[0]))
-        self.size = d + 2*maxturns
-        self.zero = maxturns
-        self.dirs = [[x, y, z, w] for x in [-1,0,1]
-            for y in [-1,0,1] for z in [-1,0,1] for w in [-1, 0, 1] if x != 0 or y != 0 or z != 0 or w != 0]
-        self.m = self.__blank()
-        for y in range(len(lines)):
-            for x in range(len(lines[0])):
-                self.m[self.zero][self.zero][y+self.zero][x+self.zero] = lines[y][x]
-
-    def __blank(self):
-        m = [None]*self.size
-        for w in range(self.size):
-            m[w] = [None]*self.size
-            for z in range(self.size):
-                m[w][z] = [None]*self.size
-                for y in range(self.size):
-                    m[w][z][y] = ['.']*self.size
-        return m
-
-    def nn(self, x, y, z, w, v):
-        n = 0
-        for d in self.dirs:
-            xx, yy, zz, ww = x+d[0], y+d[1], z+d[2], w+d[3]
-            if self.m[ww][zz][yy][xx] == v:
-                n += 1
-        return n
-    
-    def step(self):
-        m2 = self.__blank()
-        for w in range(1, self.size-1):
-            for z in range(1, self.size-1):
-                for y in range(1, self.size-1):
-                    for x in range(1, self.size-1):
-                        if self.m[w][z][y][x] == '#':
-                            n = self.nn(x,y,z,w,'#')
-                            if n == 2 or n == 3:
-                                m2[w][z][y][x] = '#'
-                        elif self.m[w][z][y][x] == '.':
-                            n = self.nn(x,y,z,w,'#')
-                            if n == 3:
-                                m2[w][z][y][x] = '#'
-        self.m = m2
-
-    def print(self):
-        for w in range(self.size):
-            for z in range(self.size):
-                print("w=", w-self.zero, "z=", z-self.zero)
-                for y in range(self.size):
-                    for x in range(self.size):
-                        print(self.m[w][z][y][x], end='')
-                    print()
-        print(self.size, self.zero, self.dirs, len(self.dirs))
-
-    def nactive(self):
-        n = 0
-        for w in range(1, self.size-1):
-            for z in range(1, self.size-1):
-                for y in range(1, self.size-1):
-                    for x in range(1, self.size-1):
-                        if self.m[w][z][y][x] == '#':
-                            n+=1
-        return n
-
-'''
-    def __p2i(p):
-        [x, y, z] = p
-        return x + self.size * (y + z * self.size)
-    def __i2p(i):
-        z = int(i / (self.size*self.size))
-        r = i % (self.size*self.size)
-        y = 
-        z = 
-'''
-
-def part1(w):
-    return 0
-
+def part1(m):
+    w = World(m, 3, 6)
+    w.step(6)
+    return w.nactive()
 def part2(m):
-    return 0
+    w = World(m, 4, 6)
+    w.step(6)
+    return w.nactive()
 
 fn = "input17.txt"
-#fn = "t"
 m = []
 with open(fn) as f:
     for l in f:
         m.append(l.strip())
-
-w = World4(m, 7)
-for i in range(6):
-    w.step()
-    print(i)
-print(w.nactive())
+test()
+print(part1(m))
+print(part2(m))
