@@ -1,6 +1,6 @@
 #!/opt/local/bin/python
 
-class World(object):
+class World():
     def __init__(self, lines, ndims, maxturns):
         assert len(lines) == len(lines[0])
         self.dim = len(lines)+2*maxturns
@@ -14,8 +14,12 @@ class World(object):
                 self.noff[l+j] = self.noff[j] + m
                 self.noff[2*l+j] = self.noff[j] - m
             l *= 3
-        self.noff = self.noff[1:]
-        self.buf = [0] * (self.dim**self.ndims)
+        self.noff = sorted(self.noff[1:])
+        self.curbuf = 0
+        sz = self.dim**self.ndims + 2*max(self.noff)
+        self.min = max(self.noff)
+        self.max = sz - max(self.noff)
+        self.buf = [ [False]*sz, [False]*sz ]
         for y in range(len(lines)):
             for x in range(len(lines)):
                 if lines[y][x] == '#':
@@ -31,24 +35,19 @@ class World(object):
             pos += self.zero*m
             m *= self.dim
             i += 1
-        assert(pos < len(self.buf))
-        self.buf[pos] = 1
-    def nn(self, i):
-        n = 0
-        for j in self.noff:
-            if i+j >= 0 and i+j < len(self.buf) and self.buf[j+i] == 1:
-                n += 1
-        return n
+        self.buf[self.curbuf][self.min+pos] = True
     def step(self, steps):
         for _ in range(steps):
-            buf = [0] * (self.dim**self.ndims)
-            for i in range(len(self.buf)):
-                n = self.nn(i)
-                buf[i] = int((self.buf[i] == 1 and (n == 2 or n == 3)) or
-                    (self.buf[i] == 0 and n == 3))
-            self.buf = buf
+            buf0 = self.buf[self.curbuf]
+            buf1 = self.buf[1-self.curbuf]
+            for i in range(self.min, self.max):
+                n = 0
+                for j in self.noff:
+                    n += buf0[i+j]
+                buf1[i] = n == 3 or (n == 2 and buf0[i])
+            self.curbuf = 1-self.curbuf
     def nactive(self):
-        return self.buf.count(1)
+        return self.buf[self.curbuf].count(True)
 
 def test():
     m = [
@@ -77,6 +76,6 @@ m = []
 with open(fn) as f:
     for l in f:
         m.append(l.strip())
-test()
-print(part1(m))
+#test()
+#print(part1(m))
 print(part2(m))
