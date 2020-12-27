@@ -76,6 +76,6 @@ m = []
 with open(fn) as f:
     for l in f:
         m.append(l.strip())
-#test()
-#print(part1(m))
+test()
+print(part1(m))
 print(part2(m))
