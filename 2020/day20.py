@@ -1,48 +1,9 @@
 #!/opt/local/bin/python
 
+from lib import mat
 import copy
 import math
 import re
-
-def col(m, n):
-    return ''.join([ row[n] for row in m])
-
-def row(m, n):
-    return ''.join(m[n])
-
-def matrixify(strs):
-    m = []
-    for s in strs:
-        m.append([c for c in s])
-    return m
-
-def flip(v):
-    v2 = []
-    for i in range(len(v)-1,-1,-1):
-        v2.append(v[i])
-    return v2
-
-def rotate(m):
-    assert(len(m) == len(m[0]))
-    l = len(m)
-    m2 = [ [ None for x in range(l) ] for y in range(l) ]
-    for r in range(l):
-        for c in range(l):
-            m2[l-1-c][r] = m[r][c]
-    return m2
-
-def test_transforms():
-    m = [[1,2,3],[4,5,6],[7,8,9]]
-    print(m)
-    print(rotate(m))
-    print(rotate(rotate(m)))
-    print(rotate(rotate(rotate(m))))
-
-    print()
-    print(flip(m))
-    print(rotate(flip(m)))
-    print(rotate(rotate(flip(m))))
-    print(rotate(rotate(rotate(flip(m)))))
 
 def filt(vals, v):
     res = vals.copy()
@@ -60,19 +21,19 @@ class Tile(object):
     """Represents a single tile, which can be flipped and rotated."""
     def __init__(self, id, lines):
         self.id = id
-        m = matrixify(lines)
+        m = mat.matrixify(lines)
         assert(len(m) == len(m[0]))
         self.m = []
         for _ in range(4):
             self.m.append(m)
-            m = rotate(m)
-        m = flip(m)
+            m = mat.rotate(m)
+        m = mat.flip(m)
         for _ in range(4):
             self.m.append(m)
-            m = rotate(m)
+            m = mat.rotate(m)
         r = []
         for m in self.m:
-            r.append([row(m, 0), col(m, len(m)-1), row(m, len(m)-1), col(m, 0)])
+            r.append([mat.row(m, 0), mat.col(m, len(m)-1), mat.row(m, len(m)-1), mat.col(m, 0)])
         self.rotations = r
         self.orientation = 0
     def top(self):
@@ -256,15 +217,15 @@ def part2(tilestr):
         "#    ##    ##    ###",
         " #  #  #  #  #  #   ",
     ]
-    m = matrixify(monster)
+    m = mat.matrixify(monster)
     im = b.image()
-    fm = flip(im)
+    fm = mat.flip(im)
     for _ in range(4):
         if convolve(im, m):
             return numhashes(im)
         if convolve(fm, m):
             return numhashes(fm)
-        im, fm = rotate(im), rotate(fm)
+        im, fm = mat.rotate(im), mat.rotate(fm)
     return 0
 
 fn = "input20.txt"
