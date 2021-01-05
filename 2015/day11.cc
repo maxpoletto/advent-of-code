@@ -1,6 +1,5 @@
 #include <string>
 #include <iostream>
-#include <stdio.h>
 #include <vector>
 
 // "Increments" a letter string: xx, xy, xz, ya, yb, ...
