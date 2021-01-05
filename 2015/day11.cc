@@ -7,8 +7,8 @@ void inc(std::string &s) {
     int carry = 1;
     for (int i = s.size() - 1; i >= 0; i--) {
         int c = s[i] - 'a' + carry;
-        carry = (c == 26);
         s[i] = 'a' + (c % 26);
+        carry = (c == 26);
     }
     if (carry) {
         s = "a" + s;
@@ -18,20 +18,18 @@ void inc(std::string &s) {
 // Tests a password for validity.
 bool good(const std::string &s) {
     // No invalid letters.
+    uint32_t bad = 1 << ('i'-'a') | 1 << ('o'-'a') | 1 << ('l'-'a');
     for (int i = 0; i < s.size(); i++) {
-        if (s[i] == 'i' || s[i] == 'o' || s[i] == 'l') {
+        if (bad & (1 << s[i])) {
             return false;
         }
     }
     // Contain an increasing straight.
     bool ok = false;
-    for (int i = 0; i < s.size() - 2 && !ok; i++) {
-        ok = true;
-        for (int j = 0; j < 3; j++) {
-            if (s[i + j] != s[i] + j) {
-                ok = false;
-                break;
-            }
+    for (int i = 0; i < s.size() - 2; i++) {
+        if (s[i]+1 == s[i+1] && s[i]+2 == s[i+2]) {
+            ok = true;
+            break;
         }
     }
     if (!ok) {
@@ -45,12 +43,7 @@ bool good(const std::string &s) {
             i++;
         }
     }
-    uint32_t n = 0;
-    while (pairs) { // Count 1-bits.
-        pairs &= (pairs-1);
-        n++;
-    }
-    return n > 1;
+    return pairs & (pairs-1); // 2 or more bits
 }
 
 // Given a password, return the next valid one.
