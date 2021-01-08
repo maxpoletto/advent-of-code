@@ -1,8 +1,5 @@
 #!/opt/local/bin/python
 
-import re
-import collections
-
 def part1(v):
     v = int(v/10)
     h = [0]*(v+1)
