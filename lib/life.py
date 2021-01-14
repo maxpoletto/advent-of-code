@@ -1,5 +1,47 @@
 #!/opt/local/bin/python
 
+class Bounded2D():
+    def __init__(self, lines):
+        assert len(lines) == len(lines[0])
+        self.dim = len(lines)+2
+        self.curbuf = 0
+        self.buf = [
+            [ [False] * self.dim for _ in range(self.dim)],
+            [ [False] * self.dim for _ in range(self.dim)],
+        ]
+        for y in range(len(lines)):
+            for x in range(len(lines)):
+                self.buf[0][y+1][x+1] = lines[y][x] == '#'
+    def nn(self, buf, y, x):
+        n = 0
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if i == 0 and j == 0: continue
+                n += int(buf[y+j][x+i])
+        return n
+    def set(self, y, x, v=True):
+        self.buf[self.curbuf][y+1][x+1] = v
+    def step(self, steps, f = lambda n, c: n == 3 or (n==2 and c)):
+        for _ in range(steps):
+            buf0 = self.buf[self.curbuf]
+            buf1 = self.buf[1-self.curbuf]
+            for y in range(1, self.dim-1):
+                for x in range(1, self.dim-1):
+                    buf1[y][x] = f(self.nn(buf0, y, x), buf0[y][x])                    
+            self.curbuf = 1-self.curbuf
+    def nactive(self):
+        n = 0
+        for b in self.buf[self.curbuf]:
+            n += b.count(True)
+        return n
+    def __str__(self):
+        s = "dim={}\n".format(self.dim)
+        for y in range(self.dim):
+            for x in range(self.dim):
+                s += ".#"[self.buf[self.curbuf][y][x]]
+            s += "\n"
+        return s
+
 class World():
     def __init__(self, lines, ndims, maxturns):
         assert len(lines) == len(lines[0])
