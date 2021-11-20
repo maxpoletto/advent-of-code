@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 class World():
     def __init__(self, lines, ndims, maxturns):

@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 def part1(n):
     n = [0] + sorted(n)

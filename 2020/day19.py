@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 def match(rules, id, message, pos):
     """Matches rule #id against message starting at position pos.

@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 def count(d, n):
     """Returns number of keys in d that have value n."""

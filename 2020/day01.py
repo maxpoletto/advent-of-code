@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 def part1(n, target):
     i, j = 0, len(n)-1

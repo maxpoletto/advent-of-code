@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 def part1(earliest, buses):
     """'earliest' is the earliest departure time.

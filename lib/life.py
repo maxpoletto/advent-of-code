@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/local/bin/python
 
 class Bounded2D():
     def __init__(self, lines):
