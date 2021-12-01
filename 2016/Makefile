@@ -9,5 +9,8 @@ TARGETS=day05
 day05: day05.cc
 	$(CC) $(CFLAGS) -o $@ $^ $(INC) $(LIB) -lstdc++ -lcrypto
 
+day14: day14.cc
+	$(CC) $(CFLAGS) -o $@ $^ $(INC) $(LIB) -lstdc++ -lcrypto
+
 clean:
 	@rm -f $(TARGETS) *~
