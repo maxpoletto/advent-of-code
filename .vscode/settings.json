@@ -6,5 +6,6 @@
         "iosfwd": "cpp",
         "__locale": "cpp",
         "string": "cpp"
-    }
+    },
+    "python.terminal.executeInFileDir": true
 }
