@@ -2,7 +2,7 @@ from lib import aodfile
 
 def fish(days):
     fish = [0]*9
-    for f in map(lambda x: int(x), aodfile.comma_separated("input/input06.txt")):
+    for f in map(int, aodfile.comma_separated("input/input06.txt")):
         fish[f] += 1
     for i in range(days):
         n = fish[0]
