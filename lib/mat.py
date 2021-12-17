@@ -25,6 +25,15 @@ def flip(v):
         v2.append(v[i])
     return v2
 
+def mirror_v(m):
+    return flip(m)
+
+def mirror_h(m):
+    m2 = []
+    for v in m:
+        m2.append(flip(v))
+    return m2
+
 # Rotate col c down by v
 def rotate_col(m, c, v):
     l = len(m)
