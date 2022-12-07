@@ -1,5 +1,3 @@
-import pprint
-
 def compsz(dir):
     s = 0
     for d in dir['d'].values():
