@@ -1,5 +1,4 @@
 def part1():
-    """read every line in input04.txt"""
     n = 0
     with open("input/input04.txt") as f:
         for l in f:
