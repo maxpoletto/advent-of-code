@@ -1,5 +1,3 @@
-from lib import aodfile
-
 def part1():
     wins = {
         'X': 'C', # rock beats scissors

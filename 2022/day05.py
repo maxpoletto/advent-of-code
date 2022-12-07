@@ -1,5 +1,3 @@
-from lib import aodfile
-
 def move_creates(reverse):
     """read every line in input04.txt"""
     pos = [1, 5, 9, 13, 17, 21, 25, 29, 33]

@@ -1,5 +1,3 @@
-from lib import aodfile
-
 def part1():
     maxelf = 0
     elf = []

@@ -1,5 +1,3 @@
-from lib import aodfile
-
 def part1():
     """read every line in input04.txt"""
     n = 0
