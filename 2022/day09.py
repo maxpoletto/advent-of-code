@@ -1,24 +1,9 @@
 def move(d, h, t, state):
     h = (h[0] + d[0], h[1] + d[1])
-    if t[1] == h[1]: # same y
-        if t[0] < h[0] - 1:
-            t = (t[0]+1, t[1])
-        elif t[0] > h[0] + 1:
-            t = (t[0]-1, t[1])
-    elif t[0] == h[0]: # same x
-        if t[1] < h[1] - 1:
-            t = (t[0], t[1]+1)
-        elif t[1] > h[1] + 1:
-            t = (t[0], t[1]-1)
-    else: # diagonal
-        if t[0] < h[0] and t[1] < h[1] and (t[0] < h[0] - 1 or t[1] < h[1] - 1):
-            t = (t[0]+1, t[1]+1)
-        elif t[0] > h[0] and t[1] > h[1] and (t[0] > h[0] + 1 or t[1] > h[1] + 1):
-            t = (t[0]-1, t[1]-1)
-        elif t[0] < h[0] and t[1] > h[1] and (t[0] < h[0] - 1 or t[1] > h[1] + 1):
-            t = (t[0]+1, t[1]-1)
-        elif t[0] > h[0] and t[1] < h[1] and (t[0] > h[0] + 1 or t[1] < h[1] - 1):
-            t = (t[0]-1, t[1]+1)
+    if max(abs(t[0]-h[0]), abs(t[1]-h[1])) > 1:
+        x = 1 if t[0] < h[0] else -1 if t[0] > h[0] else 0
+        y = 1 if t[1] < h[1] else -1 if t[1] > h[1] else 0
+        t = (t[0]+x, t[1]+y)
     if state:
         state.add(t)
     return h, t
