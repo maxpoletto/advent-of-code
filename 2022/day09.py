@@ -22,16 +22,6 @@ def move(d, h, t, state):
     if state:
         state.add(t)
     return h, t
-"""
-         if t[0] < h[0] - 1:
-            t = (t[0]+1, h[1])
-        elif t[0] > h[0] + 1:
-            t = (t[0]-1, h[1])
-        elif t[1] < h[1] - 1:
-            t = (h[0], t[1]+1)
-        elif t[1] > h[1] + 1:
-            t = (h[0], t[1]-1)
- """
 
 def move_rope(d, r, state):
     r[0] = (r[0][0] + d[0], r[0][1] + d[1])
@@ -39,46 +29,27 @@ def move_rope(d, r, state):
         r[i-1], r[i] = move((0, 0), r[i-1], r[i], None)
     state.add(r[9])
 
+dirs = { "R": (1, 0), "L": (-1, 0), "U": (0, 1), "D": (0, -1) }
 def part1():
     h, t = (0,0), (0,0)
     state = { t }
     with open("input/input09.txt") as f:
-#    with open("input/yy") as f:
         for l in f:
-            dir, dist = l.strip().split()
-            dist = int(dist)
-            if dir == "R":
-                d = (1, 0)
-            elif dir == "L":
-                d = (-1, 0)
-            elif dir == "U":
-                d = (0, 1)
-            elif dir == "D":
-                d = (0, -1)
+            a, b = l.strip().split()
+            dir, dist = dirs[a], int(b)
             for i in range(dist):
-                h, t = move(d, h, t, state)
-            #print(dist, dir, state)
+                h, t = move(dir, h, t, state)
     print(len(state))
 
-#2604 high
 def part2():
     rope = [ (0,0) for i in range(10) ]
     state = { rope[9] }
     with open("input/input09.txt") as f:
-#    with open("input/yy") as f:
         for l in f:
-            dir, dist = l.strip().split()
-            dist = int(dist)
-            if dir == "R":
-                d = (1, 0)
-            elif dir == "L":
-                d = (-1, 0)
-            elif dir == "U":
-                d = (0, 1)
-            elif dir == "D":
-                d = (0, -1)
+            a, b = l.strip().split()
+            dir, dist = dirs[a], int(b)
             for i in range(dist):
-                move_rope(d, rope, state)
+                move_rope(dir, rope, state)
     print(len(state))
 
 part1()
