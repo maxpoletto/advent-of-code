@@ -1,4 +1,3 @@
-
 def parse():
     m = []
     with open('input/input12.txt') as f:

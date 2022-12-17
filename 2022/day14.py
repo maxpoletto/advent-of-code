@@ -1,5 +1,3 @@
-import functools
-
 # returns a wall map and the relative x-coordinate of the sand source (logically at 500,0)
 def parse(part):
     walls = []
