@@ -3,7 +3,6 @@ from copy import deepcopy
 # Return a tuple (m, pos, cur), where m is the map, pos is the (row, col) position of the guard,
 # and cur is the guard's current direction (one of the keys of the dir dictionary).
 def read_input():
-    # Returns 
     m = []
     with open("input/i06.txt") as f:
         for l in f:
