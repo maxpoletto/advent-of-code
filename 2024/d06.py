@@ -1,6 +1,9 @@
-from pprint import pprint
+from copy import deepcopy
 
+# Return a tuple (m, pos, cur), where m is the map, pos is the (row, col) position of the guard,
+# and cur is the guard's current direction (one of the keys of the dir dictionary).
 def read_input():
+    # Returns 
     m = []
     with open("input/i06.txt") as f:
         for l in f:
@@ -15,8 +18,7 @@ def read_input():
                 break
         if pos:
             break
-    assert pos is not None
-    return m, len(m), len(m[0]), pos, cur
+    return m, pos, cur
 
 dir = {
     '^': (-1, 0),
@@ -32,66 +34,76 @@ turn = {
     '>': 'v'
 }
 
+# Advance the guard in the current direction, or turn if it hits an obstacle.
+# Returns (None, None) if the guard goes out of bounds.
+def advance(m, pos, cur):
+    d = dir[cur]
+    p2 = (pos[0] + d[0], pos[1] + d[1])
+    if p2[0] < 0 or p2[0] >= len(m) or p2[1] < 0 or p2[1] >= len(m[0]):
+        return None, None
+    if m[p2[0]][p2[1]] != '.':
+        cur = turn[cur]
+    else:
+        pos = p2
+    return cur, pos
+
 def part1():
-    m, h, w, pos, cur = read_input()
+    m, pos, cur = read_input()
     v = set()
     while (True):
         v.add(pos)
-        d = dir[cur]
-        p2 = (pos[0] + d[0], pos[1] + d[1])
-        if p2[0] < 0 or p2[0] >= h or p2[1] < 0 or p2[1] >= w:
+        cur, pos = advance(m, pos, cur)
+        if not cur:
             break
-        if m[p2[0]][p2[1]] != '.':
-            cur = turn[cur]
-            continue
-        pos = p2
     print(len(v))
 
+def try_loop(m, v, pos, cur):
+    obs = (pos[0] + dir[cur][0], pos[1] + dir[cur][1])
+
+    # Do not place an obstacle (a) out of bounds, (b) where another obstacle
+    # already exists, (c) where the guard has already walked (otherwise she
+    # would not be able to reach the current spot).
+    if (obs[0] < 0 or obs[0] >= len(m) or obs[1] < 0 or obs[1] >= len(m[0]) or
+        m[obs[0]][obs[1]] != '.' or v[obs[0]][obs[1]] != '.'):
+        return None
+
+    m[obs[0]][obs[1]] = '#'
+    cur = turn[cur]
+    v2 = {}
+    while (True):
+        v2[pos] = v2.get(pos, 0) + 1
+        cur, pos = advance(m, pos, cur)
+        if not cur:
+            m[obs[0]][obs[1]] = '.'
+            return None
+        # The obstacle creates a loop if (a) we find ourselves on
+        # the previous path going in the same direction (v), or (b) we
+        # have visited the same cell more than twice (v2). Case (a)
+        # is a short-cut, but case (b) is necessary to detect
+        # single-row/column loops (>>>> <<<<) in places the guard
+        # has not visited before.
+        if v[pos[0]][pos[1]] == cur or pos in v2 and v2[pos] > 2:
+            m[obs[0]][obs[1]] = '.'
+            return obs
+
 def part2():
-    m, h, w, pos, cur = read_input()
-    v = set()
-    turns_r, turns_c, nturns = {}, {}, 0
+    m, pos, cur = read_input()
+    v = deepcopy(m) # Map of the guard's path
     obs = set()
     while (True):
-        v.add(pos)
         d = dir[cur]
+        v[pos[0]][pos[1]] = cur
+        o = try_loop(m, v, pos, cur)
+        if o:
+            obs.add(o)
         p2 = (pos[0] + d[0], pos[1] + d[1])
-        if p2[0] < 0 or p2[0] >= h or p2[1] < 0 or p2[1] >= w:
+        if p2[0] < 0 or p2[0] >= len(m) or p2[1] < 0 or p2[1] >= len(m[0]):
             break
         if m[p2[0]][p2[1]] != '.':
-            turns_r.setdefault(pos[0], []).append(pos[1])
-            turns_c.setdefault(pos[1], []).append(pos[0])
-            turns_r[pos[0]].sort()
-            turns_c[pos[1]].sort()
-            print('Turn at', pos, cur)
             cur = turn[cur]
-            nturns += 1
-            continue
-        pos = p2
-        if cur == '^':
-            if (pos[0] in turns_r and
-                pos[1] < turns_r[pos[0]][-1] and
-                pos[0] > 0 and
-                m[pos[0] - 1][pos[1]] == '.'):
-                    obs.add((pos[0] - 1, pos[1]))
-        elif cur == 'v':
-            if (pos[0] in turns_r and
-                pos[1] > turns_r[pos[0]][0] and
-                pos[0] < h - 1 and
-                m[pos[0] + 1][pos[1]] == '.'):
-                    obs.add((pos[0] + 1, pos[1]))
-        elif cur == '<':
-            if (pos[1] in turns_c and
-                pos[0] > turns_c[pos[1]][0] and
-                pos[1] > 0 and
-                m[pos[0]][pos[1] - 1] == '.'):
-                    obs.add((pos[0], pos[1] - 1))
-        elif cur == '>':
-            if (pos[1] in turns_c and
-                pos[0] < turns_c[pos[1]][-1] and
-                pos[1] < w - 1 and
-                m[pos[0]][pos[1] + 1] == '.'):
-                    obs.add((pos[0], pos[1] + 1))
+            v[pos[0]][pos[1]] = cur
+        else:
+            pos = p2
     print(len(obs))
 
 part1()
