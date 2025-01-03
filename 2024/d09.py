@@ -40,17 +40,16 @@ def part2():
 
     l = read_input()
     pos, blocks = 0, []
-    for i, v in enumerate(l[:-1:2]):
-        blocks.append(Block(pos, v, i)) # Used block
-        pos += v
-        blocks.append(Block(pos, l[2*i+1])) # Free block
-        pos += l[2*i+1]
+    for i in range(0, len(l)-1, 2):
+        blocks.append(Block(pos, l[i], i//2)) # Used block
+        pos += l[i]
+        blocks.append(Block(pos, l[i+1])) # Free block
+        pos += l[i+1]
     blocks.append(Block(pos, l[-1], len(l)//2))
 
     for i in range(len(blocks)-1, -1, -2):
         for j in range(1, i, 2):
-            u = blocks[i]
-            f = blocks[j]
+            u, f = blocks[i], blocks[j]
             if (f.len >= u.len):
                 u.pos = f.pos
                 f.pos += u.len
