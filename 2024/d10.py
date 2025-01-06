@@ -1,3 +1,5 @@
+from collections import deque
+
 def read_input():
     with open("input/i10.txt") as f:
         m = [list(map(int, list(l.strip()))) for l in f]
@@ -6,10 +8,10 @@ def read_input():
 
 def find_summits(m, th, all_paths):
     explored = set({th})
-    q = [th]
+    q = deque({th})
     summits = []
     while q:
-        r, c = q.pop(0)
+        r, c = q.pop()
         if m[r][c] == 9:
             summits.append((r, c))
             continue

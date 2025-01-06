@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Counter as CounterType
 
 def read_input():
@@ -40,11 +41,11 @@ def part2():
         for c in range(1, len(m[0])-1):
             if (r, c) in visited:
                 continue
-            v, q = m[r][c], [(r, c)]
+            v, q = m[r][c], deque({(r, c)})
             area, corn = 0, 0
             visited.add((r, c))
             while q:
-                rr, cc = q.pop(0)
+                rr, cc = q.pop()
                 area += 1
                 for x, y in [(( 0,  1), (-1, 0)),  # upper right
                              (( 0,  1), ( 1, 0)),  # lower right
