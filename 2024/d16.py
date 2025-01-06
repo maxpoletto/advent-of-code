@@ -1,5 +1,6 @@
 from collections import deque
-# 577 too low
+import time
+
 def read_input():
     """Return map and start and end positions."""
     m = []
@@ -17,65 +18,52 @@ def read_input():
                 s = (i, j)
     return m, s, e
 
-dirs = { # coordinate changes based on current direction
-    '^': (-1, 0),
-    'v': (1, 0),
-    '<': (0, -1),
-    '>': (0, 1)
-}
-rot = { # new directions based on current direction
-    '^': "^<>",
-    'v': "v><",
-    '<': "<v^",
-    '>': ">^v"
-}
-costs = [ 1, 1001, 1001 ] # costs for going forward, left, right, back
+dirs = [ (-1, 0), (0, 1), (1, 0), (0, -1) ] # clockwise order from up
+costs = [ 1, 1001, 1001 ] # costs for going forward, left, right
 INF = float('inf')
 
-def least_cost(m, s, e, d):
-    """Find the least-cost path from s to e, heading in direction d."""
-    q = deque([s])
-    score, bestd = { s: 0 }, { s: '>' }
-    bt = {}
+def least_cost(m, start, end, dirindex):
+    """Find the least-cost path from start to end, heading in direction given by dirindex."""
+    v = [ [ INF ] * len(m[0]) for _ in m ]
+    v[start[0]][start[1]] = 0
+    q = deque([[start[0], start[1], dirindex, 0]]) # tile, direction, cost
     while q:
-        n = q.pop()
-        if n == e:
+        row, col, dir, cost = q.popleft()
+        if (row, col) == end:
             continue
-        d = bestd[n]
-        for i in range(3): # forward, left, right
-            nd = rot[d][i]
-            g = (n[0] + dirs[nd][0], n[1] + dirs[nd][1])
-            if m[g[0]][g[1]] == '#':
+        # Directions are always enumerated in forward, left, right order
+        newdirs = [ x % len(dirs) for x in [dir, dir-1, dir+1] ]
+        for i, newdir in enumerate(newdirs):
+            nrow, ncol = row + dirs[newdir][0], col + dirs[newdir][1]
+            if m[nrow][ncol] == '#':
                 continue
-            cost = score[n] + costs[i]
-            if score.get(g, INF) > cost:
-                score[g], bestd[g] = cost, nd
-                q.append(g)
-                bt.setdefault(g, []).append([ n, score[n] ])
+            ncost = cost + costs[i]
+            if v[nrow][ncol] > ncost:
+                v[nrow][ncol] = ncost
+                q.append([nrow, ncol, newdir, ncost])
 
-    best = score[e]
-
-    # Backtrack to find the path
-    tiles = set()
-    # Find all paths back from e to s, and sum their costs
-    # For each path, if the sum of the costs is is the best cost, add
-    # all nodes in the path to the best set.
-    q = deque([[e, best, [e]]])
+    best = v[end[0]][end[1]]
+    q = deque([[end[0], end[1], 2, best],  # going down
+               [end[0], end[1], 3, best]]) # going left
+    seen = set({end})
     while q:
-        n, cost, path = q.pop()
-        print(n, cost)
-        if n == s:
-            print(path)
-            tiles.update(path)
+        row, col, dir, cost = q.popleft()
+        if (row, col) == start:
             continue
-        for n2, c in bt[n]:
-            if c in [cost - 1, cost - 1001] and n2 not in path:
-                q.append([n2, c, path + [n2]])
+        newdirs = [ x % len(dirs) for x in [dir, dir-1, dir+1] ]
+        for i, newdir in enumerate(newdirs):
+            nrow, ncol = row + dirs[newdir][0], col + dirs[newdir][1]
+            ncost = cost - costs[i]
+            if (v[nrow][ncol] == ncost or v[nrow][ncol] == ncost-1000) and (nrow, ncol) not in seen:
+                seen.add((nrow, ncol))
+                q.append([nrow, ncol, newdir, ncost])
+    return (best, len(seen))
 
-    return best, len(tiles)
-
-def part1():
+# Both parts
+def parts():
     m, s, e = read_input()
-    print(least_cost(m, s, e, '>'))
+    t0 = time.time()
+    print(least_cost(m, s, e, 1))
+    print("Elapsed = ", time.time() - t0)
 
-part1()
+parts()
