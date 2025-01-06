@@ -11,7 +11,7 @@ def find_summits(m, th, all_paths):
     q = deque({th})
     summits = []
     while q:
-        r, c = q.pop()
+        r, c = q.popleft()
         if m[r][c] == 9:
             summits.append((r, c))
             continue

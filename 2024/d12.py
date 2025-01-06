@@ -18,11 +18,11 @@ def part1():
         for c in range(1, len(m[0])-1):
             if (r, c) in visited:
                 continue
-            v, q = m[r][c], [(r, c)]
+            v, q = m[r][c], deque([(r, c)])
             area, peri = 0, 0
             visited.add((r, c))
             while q:
-                rr, cc = q.pop(0)
+                rr, cc = q.popleft()
                 area += 1
                 for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
                     if m[rr+dr][cc+dc] != v:
@@ -45,7 +45,7 @@ def part2():
             area, corn = 0, 0
             visited.add((r, c))
             while q:
-                rr, cc = q.pop()
+                rr, cc = q.popleft()
                 area += 1
                 for x, y in [(( 0,  1), (-1, 0)),  # upper right
                              (( 0,  1), ( 1, 0)),  # lower right
