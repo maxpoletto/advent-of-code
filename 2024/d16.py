@@ -18,12 +18,55 @@ def read_input():
                 s = (i, j)
     return m, s, e
 
-dirs = [ (-1, 0), (0, 1), (1, 0), (0, -1) ] # clockwise order from up
-costs = [ 1, 1001, 1001 ] # costs for going forward, left, right
 INF = float('inf')
 
-def least_cost(m, start, end, dirindex):
-    """Find the least-cost path from start to end, heading in direction given by dirindex."""
+def least_cost_hash(m, start, end, dir):
+    """Find least cost path from start to end, starting in direction dir, using hash table to store costs."""
+
+    dirs = { '^': (-1, 0), 'v': (1, 0), '<': (0, -1), '>': (0, 1) }
+    # Moves forward, left, right, and the corresponding costs
+    rot =  { '^': "^<>",   'v': "v><",  '<': "<v^",   '>': ">^v"  }
+    costs = [ 1, 1001, 1001 ]
+
+    score = { start: 0 }
+    q = deque([[start, dir, 0]])
+    while q:
+        tile, dir, cost = q.popleft()
+        if tile == end:
+            continue
+        for i in range(3): # forward, left, right
+            ndir = rot[dir][i]
+            ntile = (tile[0] + dirs[ndir][0], tile[1] + dirs[ndir][1])
+            if m[ntile[0]][ntile[1]] == '#':
+                continue
+            ncost = cost + costs[i]
+            if score.get(ntile, INF) > ncost:
+                score[ntile] = ncost
+                q.append([ntile, ndir, ncost])
+    best = score[end]
+    q = deque([[end, 'v', best],  # going down
+               [end, '<', best]]) # going left
+    seen = set({end})
+    while q:
+        tile, dir, cost = q.popleft()
+        if tile == start:
+            continue
+        for i in range(3): # forward, left, right
+            ndir = rot[dir][i]
+            ntile = (tile[0] + dirs[ndir][0], tile[1] + dirs[ndir][1])
+            ncost = cost - costs[i]
+            ocost = score.get(ntile, INF)
+            if (ocost == ncost or ocost == ncost-1000) and ntile not in seen:
+                seen.add(ntile)
+                q.append([ntile, ndir, ncost])
+    return (best, len(seen))
+
+def least_cost_grid(m, start, end, dirindex):
+    """Find least cost path from start to end, starting in direction given by dirindex, using a grid to store costs."""
+
+    dirs = [ (-1, 0), (0, 1), (1, 0), (0, -1) ] # clockwise order from up
+    costs = [ 1, 1001, 1001 ] # costs for going forward, left, right
+
     v = [ [ INF ] * len(m[0]) for _ in m ]
     v[start[0]][start[1]] = 0
     q = deque([[start[0], start[1], dirindex, 0]]) # tile, direction, cost
@@ -63,7 +106,10 @@ def least_cost(m, start, end, dirindex):
 def parts():
     m, s, e = read_input()
     t0 = time.time()
-    print(least_cost(m, s, e, 1))
-    print("Elapsed = ", time.time() - t0)
+    print(least_cost_hash(m, s, e, '>'))
+    print("Elapsed (hash) = ", time.time() - t0)
+    t0 = time.time()
+    print(least_cost_grid(m, s, e, 1))
+    print("Elapsed (grid) = ", time.time() - t0)
 
 parts()
