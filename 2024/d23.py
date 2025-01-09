@@ -1,5 +1,3 @@
-import copy
-
 def read_input():
     g = {}
     with open('input/i23.txt') as f:
@@ -21,7 +19,6 @@ def clique3(g):
     return cliques
 
 def max_clique(g):
-    g = copy.deepcopy(g)
     mq = set()
     for n in g:
         clique = set([n])
