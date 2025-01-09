@@ -5,7 +5,8 @@
         "limits": "cpp",
         "iosfwd": "cpp",
         "__locale": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "vector": "cpp"
     },
     "python.terminal.executeInFileDir": true
 }
