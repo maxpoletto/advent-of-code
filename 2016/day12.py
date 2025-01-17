@@ -9,16 +9,14 @@ def exec(code, reg, m) -> int:
     i = 0
     while i < len(code):
         c = code[i]
-        if c[0] == 'cpy':
-            m[c[2]] = val(c[1])
-        elif c[0] == 'inc':
-            m[c[1]] += 1
-        elif c[0] == 'dec':
-            m[c[1]] -= 1
-        elif c[0] == 'jnz':
-            if val(c[1]) != 0:
-                i += int(c[2])
-                continue
+        match c[0]:
+            case 'cpy': m[c[2]] = val(c[1])
+            case 'inc': m[c[1]] += 1
+            case 'dec': m[c[1]] -= 1
+            case 'jnz':
+                if val(c[1]) != 0:
+                    i += int(c[2])
+                    continue
         i += 1
     return m[reg]
 

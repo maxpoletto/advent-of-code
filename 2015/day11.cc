@@ -55,10 +55,8 @@ std::string nextpass(const std::string &ss) {
     return s;
 }
 
-int main(int argc, char *argv[])
-{
-    if (argc < 2)
-    {
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
         printf("Usage: day11 <password>\n");
         return 1;
     }
